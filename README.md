@@ -23,13 +23,14 @@ Then open `http://127.0.0.1:8101/` in a browser that is signed in to LinkedIn.
 
 ## Browser note
 
-Use **Chrome or Chromium**. Firefox's Total Cookie Protection partitions the
-cookie jar for cross site requests by default, so the session cookie is not
-attached and the endpoint answers `401`. That `401` is the absence of a
-session, not the endpoint refusing the request.
+The buttons submit as a normal top level navigation, so linkedin.com is a first party
+context and the session cookie is attached. Verified working in Chrome and in Firefox
+with Total Cookie Protection at its default setting.
 
-Opening the file as `file://` fails for the same reason: the origin becomes
-`null` and the cookie jar is partitioned away.
+Do not deliver this through `fetch` or a hidden iframe: that is a third party context,
+and browsers that partition or block third party cookies will send no session cookie,
+so the endpoint answers `401`. That `401` is the absence of a session, not the endpoint
+refusing the request.
 
 ## Warning
 
